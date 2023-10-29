@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -98,6 +99,8 @@ import (
 	qgbmodulekeeper "github.com/celestiaorg/celestia-app/x/qgb/keeper"
 	qgbmoduletypes "github.com/celestiaorg/celestia-app/x/qgb/types"
 	ibctestingtypes "github.com/cosmos/ibc-go/v6/testing/types"
+
+	"github.com/cosmos/cosmos-sdk/store/streaming"
 )
 
 const (
@@ -269,6 +272,13 @@ func New(
 		ibctransfertypes.StoreKey,
 		ibchost.StoreKey,
 	)
+
+	// load state streaming if enabled
+	if _, _, err := streaming.LoadStreamingServices(bApp, appOpts, appCodec, keys); err != nil {
+		fmt.Printf("failed to load state streaming: %s", err)
+		os.Exit(1)
+	}
+
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
